@@ -1,0 +1,13 @@
+bsc:
+  testnet:
+    web3NodeRpcDev: https://data-seed-prebsc-1-s2.binance.org:8545
+    chainIdDev: 97
+    marketContractAddressDev: ""
+    deployerAddressDev: ""
+  mainnet:
+    web3NodeRpc: https://bsc-dataseed.binance.org
+    chainId: 56
+    marketContractAddress: ""
+    deployerAddress: ""
+
+

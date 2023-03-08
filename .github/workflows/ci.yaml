@@ -1,0 +1,32 @@
+name: Build Backend App
+on:
+  pull_request:
+  push:
+    branches:
+      - dev
+      - main
+jobs:
+  lint:
+    name: Lint & Build App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }} on ${{ matrix.os }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install Dependencies
+        run: yarn install
+
+      - name: Run Lint
+        run: yarn lint
+
+      - name: Audit for vulnerabilities
+        run: yarn audit-ci
+
+      - name: Build App
+        run: yarn build
