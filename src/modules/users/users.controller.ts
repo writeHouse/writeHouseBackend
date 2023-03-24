@@ -16,7 +16,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { UserUpdateProfileDto } from './users.dto';
 import { Web3Helper } from '../../utils/web3Helper';
-import { isValidAddress } from '../../utils/Utils';
+import { isValidAddress } from '../../utils/utils';
 import logger from '../../utils/logger';
 import { WalletSignatureGuard } from '../../guards/walletSignature.guard';
 
