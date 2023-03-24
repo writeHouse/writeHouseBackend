@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import 'dotenv/config';
 import { AppModule } from './app.module';
+import { startPolyglot } from './polyglot';
 
 const { PORT = 3000, API_VERSION = 'v1' } = process.env;
 
@@ -10,6 +11,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
   app.setGlobalPrefix(API_VERSION);
+  app.use(startPolyglot);
 
   const options = new DocumentBuilder()
     .setTitle(`WriteHouse Backend`)

@@ -7,6 +7,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './modules/users/users.module';
+import { ArticlesModule } from './modules/articles/articles.module';
+import { ArticlesHistoryModule } from './modules/articles-history/articles-history.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { UsersModule } from './modules/users/users.module';
     ConfigModule.forRoot(),
     ScheduleModule.forRoot(),
     UsersModule,
+    ArticlesModule,
+    ArticlesHistoryModule,
   ],
   controllers: [AppController],
   providers: [

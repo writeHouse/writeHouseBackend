@@ -8,6 +8,8 @@ import {
   NotFoundException,
   BadRequestException,
   CacheTTL,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
 
 import { ApiTags } from '@nestjs/swagger';
@@ -16,7 +18,7 @@ import { UserUpdateProfileDto } from './users.dto';
 import { Web3Helper } from '../../utils/web3Helper';
 import { isValidAddress } from '../../utils/Utils';
 import logger from '../../utils/logger';
-import { validateWalletSignature } from '../../utils/validateWalletSignature';
+import { WalletSignatureGuard } from '../../guards/walletSignature.guard';
 
 @ApiTags('users')
 @Controller('users')
@@ -24,26 +26,13 @@ export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @Put('/profile')
+  @UseGuards(WalletSignatureGuard)
   async updateProfile(@Body() userData: UserUpdateProfileDto, @Req() req) {
     const { polyglot } = req;
 
     const checksumAddress = Web3Helper.getAddressChecksum(userData.walletAddress);
 
     const foundUser = await this.userService.findByAddress(checksumAddress);
-
-    if (!checksumAddress || !foundUser) {
-      throw new BadRequestException(polyglot.t('Could not update user data - Error logged'));
-    }
-
-    if (
-      !(await validateWalletSignature({
-        data: userData,
-        walletAddress: userData.walletAddress,
-        signature: userData.signature,
-      }))
-    ) {
-      throw new BadRequestException(polyglot.t('Could not update user data - Error logged'));
-    }
 
     if (
       userData.socialUrl &&
@@ -89,18 +78,14 @@ export class UsersController {
       email: userData?.email || foundUser?.email || null,
       username: userData?.username || foundUser?.username || null,
       userBio: userData?.userBio || foundUser?.userBio || null,
-      userAvatarUrl: userData?.userAvatarUrl || foundUser?.userAvatarUrl || null,
-      userAvatarUrlCompressed: userData?.userAvatarUrl
-        ? userData?.userAvatarUrlCompressed || null
-        : foundUser?.userAvatarUrlCompressed || null,
-      userAvatarUrlThumbnail: userData?.userAvatarUrl
-        ? userData?.userAvatarUrlThumbnail || null
-        : foundUser?.userAvatarUrlThumbnail || null,
+      avatarUrl: userData?.avatarUrl || foundUser?.avatarUrl || null,
+      avatarUrlThumbnail: userData?.avatarUrl
+        ? userData?.avatarUrlThumbnail || null
+        : foundUser?.avatarUrlThumbnail || null,
       coverUrl: userData?.coverUrl ? userData?.coverUrl || null : foundUser?.coverUrl || null,
-      coverThumbnailUrl: userData?.coverThumbnailUrl
-        ? userData?.coverThumbnailUrl || null
-        : foundUser?.coverThumbnailUrl || null,
-      usernameLowercase: (userData?.username || foundUser?.username || '')?.toLowerCase(),
+      coverUrlThumbnail: userData?.coverUrlThumbnail
+        ? userData?.coverUrlThumbnail || null
+        : foundUser?.coverUrlThumbnail || null,
       socialUrl: userData?.socialUrl || foundUser?.socialUrl || null,
       twitterUrl: userData?.twitterUrl !== undefined ? userData?.twitterUrl : foundUser?.twitterUrl,
       linkedinUrl: userData?.linkedinUrl !== undefined ? userData?.linkedinUrl : foundUser?.linkedinUrl,
@@ -152,7 +137,7 @@ export class UsersController {
     if (!user) {
       if (isValidAddress(addressOrUsername)) {
         user = await this.userService.saveNewUser({
-          userAvatarUrl: '',
+          avatarUrl: '',
           userBio: '',
           username: '',
           walletAddress: addressOrUsername,
