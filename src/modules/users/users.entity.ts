@@ -1,4 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, UpdateDateColumn, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, UpdateDateColumn, CreateDateColumn, OneToMany } from 'typeorm';
+import { ArticleHistory } from '../articles-history/articles-history.entity';
+import { Article } from '../articles/articles.entity';
 
 @Entity('users')
 export class User {
@@ -12,28 +14,22 @@ export class User {
   username: string;
 
   @Column({ nullable: true, type: 'varchar' })
-  usernameLowercase: string;
-
-  @Column({ nullable: true, type: 'varchar' })
   email: string;
 
   @Column({ nullable: true, type: 'varchar' })
   fullName: string;
 
   @Column({ nullable: true, type: 'varchar' })
-  userAvatarUrl: string;
+  avatarUrl: string;
 
   @Column({ nullable: true, type: 'varchar' })
-  userAvatarUrlThumbnail: string;
-
-  @Column({ nullable: true, type: 'varchar' })
-  userAvatarUrlCompressed: string;
+  avatarUrlThumbnail: string;
 
   @Column({ nullable: true, type: 'varchar' })
   coverUrl: string;
 
   @Column({ nullable: true, type: 'varchar' })
-  coverThumbnailUrl: string;
+  coverUrlThumbnail: string;
 
   @Column({ nullable: true, type: 'varchar' })
   userBio: string;
@@ -87,7 +83,7 @@ export class User {
   followingCount: number;
 
   @Column({ nullable: true, type: 'int4', default: 0 })
-  CreatedCount: number;
+  createdCount: number;
 
   @Column({ nullable: true, type: 'varchar' })
   username_search: string;
@@ -97,6 +93,18 @@ export class User {
 
   @Column({ nullable: true, type: 'varchar' })
   keywords_search: string;
+
+  @OneToMany(() => Article, (article: Article) => article.author)
+  public articlesCreated: Article[];
+
+  @OneToMany(() => Article, (article: Article) => article.owner)
+  public articlesOwned: Article[];
+
+  @OneToMany(() => ArticleHistory, (articleHistory: ArticleHistory) => articleHistory.actor)
+  public actions: ArticleHistory[];
+
+  @OneToMany(() => ArticleHistory, (articleHistory: ArticleHistory) => articleHistory.receiver)
+  public receivedActions: ArticleHistory[];
 
   @CreateDateColumn({
     type: 'timestamp',

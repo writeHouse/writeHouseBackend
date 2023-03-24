@@ -22,15 +22,11 @@ export class UserUpdateProfileDto {
 
   @IsString()
   @IsOptional()
-  readonly userAvatarUrl: string;
+  readonly avatarUrl: string;
 
   @IsString()
   @IsOptional()
-  readonly userAvatarUrlCompressed: string;
-
-  @IsString()
-  @IsOptional()
-  readonly userAvatarUrlThumbnail: string;
+  readonly avatarUrlThumbnail: string;
 
   @IsString()
   @IsOptional()
@@ -38,7 +34,7 @@ export class UserUpdateProfileDto {
 
   @IsString()
   @IsOptional()
-  readonly coverThumbnailUrl: string;
+  readonly coverUrlThumbnail: string;
 
   @IsString()
   @IsOptional()

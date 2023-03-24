@@ -1,0 +1,4 @@
+{
+  "Username is already taken: %{username} - %{address} Attempt": "Utilisateur est déjà pris : %{username} - %{address} Tentative",
+  "Article created successfully with id: %{id}": "Article créé avec succès avec id %{id}"
+}

@@ -21,6 +21,10 @@ export class UsersService {
     return this.userRepository.find();
   }
 
+  getAll(): Promise<User[]> {
+    return this.userRepository.find();
+  }
+
   findOne(id: string): Promise<User> {
     return this.userRepository.findOne(id);
   }
@@ -33,9 +37,6 @@ export class UsersService {
         },
         {
           username: walletAddress,
-        },
-        {
-          usernameLowercase: walletAddress?.toLowerCase(),
         },
       ],
     });
@@ -61,5 +62,17 @@ export class UsersService {
 
   updateById(id: number, data: Partial<User>): Promise<UpdateResult> {
     return this.userRepository.update(id, data);
+  }
+
+  updateByAddress(walletAddress: string, data: Partial<User>): Promise<UpdateResult> {
+    return this.userRepository.update({ walletAddress }, data);
+  }
+
+  increment({ id, column, by = 1 }: { id: number; column: keyof User; by?: number }): Promise<UpdateResult> {
+    return this.userRepository.increment({ id }, column, by);
+  }
+
+  decrement({ id, column, by = 1 }: { id: number; column: keyof User; by?: number }): Promise<UpdateResult> {
+    return this.userRepository.decrement({ id }, column, by);
   }
 }
