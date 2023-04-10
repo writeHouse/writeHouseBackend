@@ -116,7 +116,7 @@ export class UsersController {
     const { polyglot } = req;
     if (!user) {
       throw new NotFoundException(
-        polyglot.t('Could not find user with specified wallet address: %{address}', {
+        polyglot.t(`Could not find user with specified wallet address: ${addressOrUsername}`, {
           address: addressOrUsername,
         }),
       );
@@ -151,7 +151,7 @@ export class UsersController {
         };
       }
       throw new NotFoundException(
-        polyglot.t('Could not find user with specified wallet address: %{address}', {
+        polyglot.t(`Could not find user with specified wallet address: ${addressOrUsername}`, {
           address: addressOrUsername,
         }),
       );

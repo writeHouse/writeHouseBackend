@@ -81,6 +81,9 @@ export class Article {
   @Column({ nullable: false, type: 'varchar', default: 'bsc' })
   chain: SupportedChain;
 
+  @Column({ nullable: true, type: 'varchar' })
+  country: string;
+
   @ManyToOne(() => Publication, (publication: Publication) => publication.articles)
   @JoinColumn()
   publication: Publication;

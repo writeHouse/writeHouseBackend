@@ -93,6 +93,7 @@ export class ArticlesService {
     article.updatedAt = dayjs().format();
     article.status = 'published';
     article.chain = data?.chain;
+    article.country = data?.country;
 
     return this.articleRepository.save(article);
   }

@@ -40,6 +40,10 @@ export class CreateArticleDto {
   @IsOptional()
   @IsEnum(SupportedChain)
   chain?: SupportedChain = SupportedChain.BINANCE;
+
+  @IsString()
+  @IsOptional()
+  country?: string;
 }
 
 export class UpdateArticleTokenDto {
