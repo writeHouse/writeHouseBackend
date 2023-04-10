@@ -24,7 +24,7 @@ export class ArticlesController {
     if (!articleAuthor || articleAuthor.notAllowedToPost) {
       throw new BadRequestException(polyglot.t('User not allowed to post'));
     }
-    const article = await this.articlesService.save({...articleData, country });
+    const article = await this.articlesService.save({...articleData, country});
 
     return {
       message: polyglot.t('article created successfully with id: %{id}', {

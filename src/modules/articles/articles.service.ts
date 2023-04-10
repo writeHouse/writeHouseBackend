@@ -64,7 +64,7 @@ export class ArticlesService {
       where: {
         walletAddress,
       },
-    });    
+    });
 
     if (!user) {
       user = await this.userRepository.save({
