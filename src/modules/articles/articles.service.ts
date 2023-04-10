@@ -64,7 +64,7 @@ export class ArticlesService {
       where: {
         walletAddress,
       },
-    });
+    });    
 
     if (!user) {
       user = await this.userRepository.save({
@@ -93,6 +93,7 @@ export class ArticlesService {
     article.updatedAt = dayjs().format();
     article.status = 'published';
     article.chain = data?.chain;
+    article.country = data?.country;
 
     return this.articleRepository.save(article);
   }

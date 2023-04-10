@@ -17,12 +17,14 @@ export class ArticlesController {
   async createArticle(@Body() articleData: CreateArticleDto, @Req() req) {
     const { polyglot } = req;
 
+    const country = req.headers['cf-ipcountry'];
+
     const articleAuthor = await this.userService.findByAddress(articleData.walletAddress);
 
     if (!articleAuthor || articleAuthor.notAllowedToPost) {
       throw new BadRequestException(polyglot.t('User not allowed to post'));
     }
-    const article = await this.articlesService.save(articleData);
+    const article = await this.articlesService.save({...articleData, country });
 
     return {
       message: polyglot.t('article created successfully with id: %{id}', {
