@@ -18,6 +18,10 @@ export class ArticlesService {
     public readonly web3Config: Web3Config,
   ) {}
 
+  async fetcharticlesPerPage(alias: string) {
+    return this.articleRepository.createQueryBuilder(alias);
+  }
+
   async validateMintTransaction(trxData: Partial<Article>): Promise<boolean> {
     logger.info('VALIDATING_MINT_TX', trxData);
     try {
