@@ -9,6 +9,8 @@ The WriteHouse Backend is an API that serves a Web 3 blog web app
 - NestJS
 - Postgres
 - AWS
+- EthersJS
+- Web3JS
 
 
 ## Setup
