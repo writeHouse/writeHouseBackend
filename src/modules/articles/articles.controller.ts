@@ -15,7 +15,6 @@ export class ArticlesController {
 
   @Get('/')
   async fetchAllArticles(@Query() { limit = 30, page = 1 }: { limit: number; page: number }) {
-    limit = limit > 30 ? 30 : limit;
     return await this.articlesService.fetchArticlesPerPage({ limit, page });
   }
 
