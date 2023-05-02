@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { UpdateResult } from 'typeorm';
 import dayjs from 'dayjs';
 import { logger } from '../../utils/logger';
-
 import { Web3Helper } from '../../utils/web3Helper';
 import { UsersRepository } from '../users/users.repository';
 import { CreateArticleDto } from './articles.dto';
@@ -17,6 +16,29 @@ export class ArticlesService {
     public readonly userRepository: UsersRepository,
     public readonly web3Config: Web3Config,
   ) {}
+
+  async fetchArticlesPerPage({ limit = 30, page = 1 }: { limit: number; page: number }) {
+    const take = limit;
+    const skip = (page - 1) * take;
+
+    const [articles, totalArticles] = await this.articleRepository.findAndCount({
+      order: {
+        id: 'DESC',
+      },
+      take,
+      skip,
+    });
+
+    return {
+      meta: {
+        limit,
+        currentPage: page,
+        totalPages: Math.ceil(totalArticles / take),
+        totalArticles,
+      },
+      articles,
+    };
+  }
 
   async validateMintTransaction(trxData: Partial<Article>): Promise<boolean> {
     logger.info('VALIDATING_MINT_TX', trxData);

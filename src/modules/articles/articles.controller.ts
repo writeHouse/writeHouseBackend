@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, NotFoundException, Post, Put, Req } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, NotFoundException, Post, Put, Query, Req } from '@nestjs/common';
 import { SaleType } from '../articles-history/articles-history.entity';
 import { ArticlesHistoryService } from '../articles-history/articles-history.service';
 import { UsersService } from '../users/users.service';
@@ -12,6 +12,11 @@ export class ArticlesController {
     private readonly userService: UsersService,
     private readonly articlesHistoryService: ArticlesHistoryService,
   ) {}
+
+  @Get('/')
+  async fetchAllArticles(@Query() { limit = 30, page = 1 }: { limit: number; page: number }) {
+    return await this.articlesService.fetchArticlesPerPage({ limit, page });
+  }
 
   @Post('/')
   async createArticle(@Body() articleData: CreateArticleDto, @Req() req) {
