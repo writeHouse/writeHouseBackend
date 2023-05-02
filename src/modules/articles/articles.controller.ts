@@ -1,16 +1,4 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Get,
-  NotFoundException,
-  ParseIntPipe,
-  Post,
-  Put,
-  Req,
-} from '@nestjs/common';
-import { Request } from 'express';
-import { OffsetWithoutLimitNotSupportedError } from 'typeorm';
+import { BadRequestException, Body, Controller, Get, NotFoundException, Post, Put, Query, Req } from '@nestjs/common';
 import { SaleType } from '../articles-history/articles-history.entity';
 import { ArticlesHistoryService } from '../articles-history/articles-history.service';
 import { UsersService } from '../users/users.service';
@@ -26,20 +14,9 @@ export class ArticlesController {
   ) {}
 
   @Get('/')
-  async fetchAllArticles(@Req() req: Request) {
-    const builder = await this.articlesService.fetcharticlesPerPage('articles');
-
-    const page: number = (req.query.page as any) || 1;
-    const perPage = 30;
-    const total = await builder.getCount();
-
-    builder.offset((page - 1) * perPage).limit(perPage);
-
-    return {
-      data: await builder.getMany(),
-      page,
-      total,
-    };
+  async fetchAllArticles(@Query() { limit = 30, page = 1 }: { limit: number; page: number }) {
+    limit = limit > 30 ? 30 : limit;
+    return await this.articlesService.fetchArticlesPerPage({ limit, page });
   }
 
   @Post('/')
