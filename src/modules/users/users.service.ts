@@ -29,6 +29,29 @@ export class UsersService {
     return this.userRepository.findOne(id);
   }
 
+  async findUsersPerPage({ limit = 30, page = 1 }: { limit: number; page: number }) {
+    const take = limit;
+    const skip = (page - 1) * take;
+
+    const [users, totalUsers] = await this.userRepository.findAndCount({
+      order: {
+        id: 'DESC',
+      },
+      take,
+      skip,
+    });
+
+    return {
+      meta: {
+        limit,
+        currentPage: page,
+        totalPages: Math.ceil(totalUsers / take),
+        totalUsers,
+      },
+      users,
+    };
+  }
+
   async findByAddressOrUsername(walletAddress: string): Promise<User> {
     const user = await this.userRepository.findOne({
       where: [
