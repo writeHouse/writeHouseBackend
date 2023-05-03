@@ -99,6 +99,11 @@ export class UsersController {
     };
   }
 
+  @Get('/')
+  async fetchAllUsers(@Query() { limit = 30, page = 1 }: { limit: number; page: number }) {
+    return await this.userService.findUsersPerPage({ limit, page });
+  }
+
   @Get('/:username/check-username')
   @CacheTTL(60 * 10)
   async checkUsernameAvailability(@Param('username') username: string) {
