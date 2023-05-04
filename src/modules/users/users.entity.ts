@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, UpdateDateColumn, CreateDateColumn, OneToMany } from 'typeorm';
 import { ArticleHistory } from '../articles-history/articles-history.entity';
 import { Article } from '../articles/articles.entity';
+import { UserFollow } from './users-follows.entity';
 
 @Entity('users')
 export class User {
@@ -105,6 +106,12 @@ export class User {
 
   @OneToMany(() => ArticleHistory, (articleHistory: ArticleHistory) => articleHistory.receiver)
   public receivedActions: ArticleHistory[];
+
+  @OneToMany(() => UserFollow, (userFollow: UserFollow) => userFollow.follower)
+  public followers: UserFollow[];
+
+  @OneToMany(() => UserFollow, (userFollow: UserFollow) => userFollow.following)
+  public followings: UserFollow[];
 
   @CreateDateColumn({
     type: 'timestamp',
