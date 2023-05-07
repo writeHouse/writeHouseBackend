@@ -12,6 +12,7 @@ import {
 import { ArticleHistory } from '../articles-history/articles-history.entity';
 import { Publication } from '../publications/publications.entity';
 import { User } from '../users/users.entity';
+import { Comment } from '../comments/comments.entity';
 
 @Entity('articles')
 export class Article {
