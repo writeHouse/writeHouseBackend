@@ -55,7 +55,7 @@ export class CommentsService {
         try {
             const comment = await this.commentRepository.findOneOrFail({id:commentData.id})
             if(comment.authorAddress != commentData.authorAddress) {
-                throw new BadRequestException('Not the author of this comment')
+                throw new BadRequestException({author:commentData.authorAddress},'Not the author of this comment')
             }
             return await this.commentRepository.update({id:commentData.id}, {body:commentData.body})
         } catch(err) {
