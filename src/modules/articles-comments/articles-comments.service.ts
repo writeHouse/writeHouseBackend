@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateCommentDto } from './comments.dto';
-import { CommentRepository } from './comments.repository';
-import { Comment } from './comments.entity';
+import { CreateCommentDto, UpdateCommentDto } from './articles-comments.dto';
+import { CommentRepository } from './articles-comments.repository';
+import { Comment } from './articles-comments.entity';
 
 @Injectable()
 export class CommentsService {
@@ -12,7 +12,7 @@ export class CommentsService {
 
     async fetchAllComments(articleId:number) {
         try {
-          return await this.commentRepository.find({id:articleId}) 
+          return await this.commentRepository.find({articleId}) 
         } catch(err) {
             throw new BadRequestException(err.message)
         }
@@ -51,7 +51,17 @@ export class CommentsService {
         
     }
 
-    /*****possibly adding an update comment section */
-
+    async updateComment(commentData:UpdateCommentDto) {
+        try {
+            const comment = await this.commentRepository.findOneOrFail({id:commentData.id})
+            if(comment.authorAddress != commentData.authorAddress) {
+                throw new BadRequestException('Not the author of this comment')
+            }
+            return await this.commentRepository.update({id:commentData.id}, {body:commentData.body})
+        } catch(err) {
+            throw new BadRequestException(err.message)
+        }
+        
+    }
 
 }

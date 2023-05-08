@@ -12,7 +12,7 @@ import {
 import { ArticleHistory } from '../articles-history/articles-history.entity';
 import { Publication } from '../publications/publications.entity';
 import { User } from '../users/users.entity';
-import { Comment } from '../comments/comments.entity';
+import { Comment } from '../articles-comments/articles-comments.entity';
 
 @Entity('articles')
 export class Article {
@@ -99,6 +99,9 @@ export class Article {
 
   @OneToMany(() => ArticleHistory, (articleHistory: ArticleHistory) => articleHistory.article)
   public history: ArticleHistory[];
+
+  @OneToMany(() => Comment, (comment:Comment) => comment.article)
+  public comments: Comment[]
 
   @CreateDateColumn({
     default: () => new Date(),

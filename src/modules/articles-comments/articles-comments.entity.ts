@@ -4,7 +4,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   CreateDateColumn,
+  ManyToOne,
 } from 'typeorm';
+import { Article } from '../articles/articles.entity';
 
 
 @Entity({name:'articles_comments'})
@@ -26,6 +28,9 @@ export class Comment {
 
   @Column({ type: 'bool', default:true })
   active: boolean;
+
+  @ManyToOne(() => Article, (article:Article) => article.comments)
+  article: Article
 
   @CreateDateColumn({
     default: () => new Date(),

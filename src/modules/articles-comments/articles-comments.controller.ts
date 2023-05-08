@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
-import { CommentsService } from './comments.service';
-import { CreateCommentDto } from './comments.dto';
+import { Body, Controller, Delete, Get, Post, Put } from '@nestjs/common';
+import { CommentsService } from './articles-comments.service';
+import { CreateCommentDto, UpdateCommentDto } from './articles-comments.dto';
 
 @Controller('comments')
 export class CommentsController {
@@ -20,6 +20,11 @@ export class CommentsController {
     @Post('/comment')
     async createComment(@Body() commentData:CreateCommentDto) {
         return this.commentsService.createComment(commentData)
+    }
+
+    @Put('/comment')
+    async updateComment(@Body() commentData:UpdateCommentDto) {
+        return this.commentsService.updateComment(commentData)
     }
 
     @Delete('/comment')

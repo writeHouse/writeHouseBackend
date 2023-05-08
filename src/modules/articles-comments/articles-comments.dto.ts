@@ -18,6 +18,9 @@ export class CreateCommentDto {
 }
 
 export class UpdateCommentDto {
+    @IsNumber()
+    id:number 
+
     @IsString()
     body:string
 

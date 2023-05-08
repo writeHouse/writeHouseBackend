@@ -9,7 +9,7 @@ import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './modules/users/users.module';
 import { ArticlesModule } from './modules/articles/articles.module';
 import { ArticlesHistoryModule } from './modules/articles-history/articles-history.module';
-import { CommentsModule } from './modules/comments/comments.module';
+import { CommentsModule } from './modules/articles-comments/articles-comments.module';
 
 @Module({
   imports: [
