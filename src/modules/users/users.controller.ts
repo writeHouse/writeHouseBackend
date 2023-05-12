@@ -16,6 +16,8 @@ import {
 } from '@nestjs/common';
 
 import { ApiTags } from '@nestjs/swagger';
+import { error } from 'console';
+import { ValidateIf } from 'class-validator';
 import { UsersService } from './users.service';
 import { UserUpdateProfileDto } from './users.dto';
 import { Web3Helper } from '../../utils/web3Helper';
@@ -23,90 +25,69 @@ import { isValidAddress } from '../../utils/utils';
 import logger from '../../utils/logger';
 import { WalletSignatureGuard } from '../../guards/walletSignature.guard';
 import { UsersFollowsWalletDto } from './users-follows.dto';
-import { error } from 'console';
-import { ValidateIf } from 'class-validator';
 import { UsersFollows } from './users-follows.entity';
 
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
-  
+
   @Post('/:walletAddress/follow')
-  async followUser(
-    @Param('walletAddress') walletAddress: string,
-    @Body() followingAddress: UsersFollowsWalletDto,
-    ){
-    if(walletAddress === followingAddress.walletAddress)
-    throw new NotFoundException["You can't follow yourself"];
+  async followUser(@Param('walletAddress') walletAddress: string, @Body() followingAddress: UsersFollowsWalletDto) {
+    if (walletAddress === followingAddress.walletAddress) throw new NotFoundException["You can't follow yourself"]();
 
-    const currentUser = await this.userService.findByAddress(walletAddress)
-    if(!currentUser) throw new NotFoundException['user not found']
+    const currentUser = await this.userService.findByAddress(walletAddress);
+    if (!currentUser) throw NotFoundException['user not found']();
 
-    // console.log(currentUser)
-
-
-    const followingUser = await this.userService.findByAddress(followingAddress.walletAddress)
-      if(!followingUser)
-      throw new NotFoundException['user not found']
-
-      // console.log(followingUser)
+    const followingUser = await this.userService.findByAddress(followingAddress.walletAddress);
+    if (!followingUser) throw NotFoundException['user not found']();
 
     const isAlreadyFollowing = await this.userService.isAlreadyFollowing({
       followerId: currentUser.id,
-      followingId: followingUser.id
-    })
+      followingId: followingUser.id,
+    });
 
-    // console.log(isAlreadyFollowing)
-    if(isAlreadyFollowing)
-    throw new ConflictException['Already followed']
+    if (isAlreadyFollowing) throw new ConflictException['Already followed']();
 
     Promise.all([
-      await this.userService.increment({id: currentUser.id, column: 'followingCount'}),
-      await this.userService.increment({id: followingUser.id, column: 'followerCount'})
-    ])
+      await this.userService.increment({ id: currentUser.id, column: 'followingCount' }),
+      await this.userService.increment({ id: followingUser.id, column: 'followerCount' }),
+    ]);
 
-    const follow = new UsersFollows()
-    follow.follower = currentUser
-    follow.following = followingUser
+    const follow = new UsersFollows();
+    follow.follower = currentUser;
+    follow.following = followingUser;
 
-    await this.userService.userFollow(follow)
+    await this.userService.userFollow(follow);
   }
 
-
   @Post('/:walletAddress/follow')
-  async unFollowUser(
-    @Param('walletAddress') walletAddress: string,
-    @Body() followingAddress: UsersFollowsWalletDto,
-    ){
-    if(walletAddress === followingAddress.walletAddress)
-    throw new ConflictException["You can't follow yourself"];
+  async unFollowUser(@Param('walletAddress') walletAddress: string, @Body() followingAddress: UsersFollowsWalletDto) {
+    if (walletAddress === followingAddress.walletAddress) throw new ConflictException["You can't follow yourself"]();
 
-    const currentUser = await this.userService.findByAddress(followingAddress.walletAddress)
-    if(!currentUser) throw new NotFoundException['user not found']
+    const currentUser = await this.userService.findByAddress(followingAddress.walletAddress);
+    if (!currentUser) throw NotFoundException['user not found']();
 
-    const followingUser = await this.userService.findByAddress(walletAddress)
-      if(!followingUser)
-      throw new NotFoundException['user not found']
+    const followingUser = await this.userService.findByAddress(walletAddress);
+    if (!followingUser) throw ConflictException['user not found']();
 
     const isAlreadyFollowing = await this.userService.isAlreadyFollowing({
       followerId: currentUser.id,
-      followingId: followingUser.id
-    })
+      followingId: followingUser.id,
+    });
 
-    if(!isAlreadyFollowing)
-    throw new ConflictException['Not followed yet']
+    if (!isAlreadyFollowing) throw new ConflictException['Not followed yet']();
 
     Promise.all([
-      await this.userService.decrement({id: currentUser.id, column: 'followingCount'}),
-      await this.userService.decrement({id: followingUser.id, column: 'followerCount'})
-    ])
+      await this.userService.decrement({ id: currentUser.id, column: 'followingCount' }),
+      await this.userService.decrement({ id: followingUser.id, column: 'followerCount' }),
+    ]);
 
-    const follow = new UsersFollows()
-    follow.follower = currentUser
-    follow.following = followingUser
+    const follow = new UsersFollows();
+    follow.follower = currentUser;
+    follow.following = followingUser;
 
-    await this.userService.userFollow(follow)
+    await this.userService.userFollow(follow);
   }
 
   @Put('/profile')

@@ -86,7 +86,6 @@ export class User {
   @Column({ nullable: true, type: 'int4', default: 0 })
   followerCount: number;
 
-
   @Column({ nullable: true, type: 'int4', default: 0 })
   followingCount: number;
 

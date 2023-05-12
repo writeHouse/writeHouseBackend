@@ -51,4 +51,3 @@ export class UserUpdateProfileDto {
   @IsString()
   signature: string;
 }
-

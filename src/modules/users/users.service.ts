@@ -12,7 +12,7 @@ export class UsersService {
   constructor(
     public readonly userRepository: UsersRepository,
     public readonly usersFollowRepository: UsersFollowRepository,
-    ) {}
+  ) {}
 
   saveNewUser(data: Partial<User>): Promise<User> {
     return this.userRepository.save({
@@ -80,25 +80,25 @@ export class UsersService {
     });
   }
 
-  async isAlreadyFollowing({followerId, followingId} : {followerId: number, followingId: number}) {
+  async isAlreadyFollowing({ followerId, followingId }: { followerId: number; followingId: number }) {
     const follow = await this.usersFollowRepository.findOne({
       where: {
         followerId,
         followingId,
-      }
-    }); 
+      },
+    });
 
     return !!follow;
   }
 
-  async userFollow(follow: UsersFollows){
-    await this.usersFollowRepository.save(follow)
-    await this.userRepository.save([follow.follower, follow.following])
+  async userFollow(follow: UsersFollows) {
+    await this.usersFollowRepository.save(follow);
+    await this.userRepository.save([follow.follower, follow.following]);
   }
 
-  async userUnFollow(follow: UsersFollows){
-    await this.usersFollowRepository.delete(follow)
-    await this.userRepository.save([follow.follower, follow.following])
+  async userUnFollow(follow: UsersFollows) {
+    await this.usersFollowRepository.delete(follow);
+    await this.userRepository.save([follow.follower, follow.following]);
   }
 
   findByUsername(username: string): Promise<User> {

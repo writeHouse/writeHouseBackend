@@ -11,7 +11,9 @@ import { ArticleHistoryRepository } from '../articles-history/articles-history.r
 import { UsersFollowRepository } from '../users/users-follows.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UsersRepository, ArticleRepository, ArticleHistoryRepository, UsersFollowRepository])],
+  imports: [
+    TypeOrmModule.forFeature([UsersRepository, ArticleRepository, ArticleHistoryRepository, UsersFollowRepository]),
+  ],
   controllers: [ArticlesController],
   providers: [ArticlesService, UsersService, ArticlesHistoryService, Web3Config],
 })
