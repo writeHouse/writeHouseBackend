@@ -1,13 +1,18 @@
 import 'dotenv/config';
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateResult } from 'typeorm';
 
 import { UsersRepository } from './users.repository';
 import { User } from './users.entity';
+import { UsersFollowRepository } from './users-follows.repository';
+import { UsersFollows } from './users-follows.entity';
 
 @Injectable()
 export class UsersService {
-  constructor(public readonly userRepository: UsersRepository) {}
+  constructor(
+    public readonly userRepository: UsersRepository,
+    public readonly usersFollowRepository: UsersFollowRepository,
+    ) {}
 
   saveNewUser(data: Partial<User>): Promise<User> {
     return this.userRepository.save({
@@ -67,12 +72,33 @@ export class UsersService {
     return user;
   }
 
-  findByAddress(walletAddress: string): Promise<User> {
+  async findByAddress(walletAddress: string): Promise<User> {
     return this.userRepository.findOne({
       where: {
         walletAddress,
       },
     });
+  }
+
+  async isAlreadyFollowing({followerId, followingId} : {followerId: number, followingId: number}) {
+    const follow = await this.usersFollowRepository.findOne({
+      where: {
+        followerId,
+        followingId,
+      }
+    }); 
+
+    return !!follow;
+  }
+
+  async userFollow(follow: UsersFollows){
+    await this.usersFollowRepository.save(follow)
+    await this.userRepository.save([follow.follower, follow.following])
+  }
+
+  async userUnFollow(follow: UsersFollows){
+    await this.usersFollowRepository.delete(follow)
+    await this.userRepository.save([follow.follower, follow.following])
   }
 
   findByUsername(username: string): Promise<User> {

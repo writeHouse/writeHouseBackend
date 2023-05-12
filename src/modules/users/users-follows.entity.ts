@@ -10,7 +10,7 @@ import {
 import { User } from './users.entity';
 
 @Entity('users_follows')
-export class UserFollow {
+export class UsersFollows {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
