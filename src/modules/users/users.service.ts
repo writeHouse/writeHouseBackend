@@ -1,6 +1,6 @@
 import 'dotenv/config';
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { UpdateResult } from 'typeorm';
+import { Injectable} from '@nestjs/common';
+import { DeleteResult, UpdateResult } from 'typeorm';
 
 import { UsersRepository } from './users.repository';
 import { User } from './users.entity';
@@ -80,7 +80,7 @@ export class UsersService {
     });
   }
 
-  async isAlreadyFollowing({ followerId, followingId }: { followerId: number; followingId: number }) {
+  async userFound({ followerId, followingId }: { followerId: number; followingId: number }) {
     const follow = await this.usersFollowRepository.findOne({
       where: {
         followerId,
@@ -91,14 +91,12 @@ export class UsersService {
     return !!follow;
   }
 
-  async userFollow(follow: UsersFollows) {
-    await this.usersFollowRepository.save(follow);
-    await this.userRepository.save([follow.follower, follow.following]);
+  async createFollow(follow: Partial<UsersFollows>): Promise<UsersFollows> {
+    return await this.usersFollowRepository.save(follow);
   }
 
-  async userUnFollow(follow: UsersFollows) {
-    await this.usersFollowRepository.delete(follow);
-    await this.userRepository.save([follow.follower, follow.following]);
+  async deleteFollow(follow: Partial<UsersFollows>): Promise<DeleteResult> {
+    return await this.usersFollowRepository.delete(follow);
   }
 
   findByUsername(username: string): Promise<User> {

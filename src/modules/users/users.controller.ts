@@ -11,8 +11,7 @@ import {
   Query,
   UseGuards,
   Post,
-  ConflictException,
-  ValidationPipe,
+  Delete,
 } from '@nestjs/common';
 
 import { ApiTags } from '@nestjs/swagger';
@@ -25,7 +24,6 @@ import { isValidAddress } from '../../utils/utils';
 import logger from '../../utils/logger';
 import { WalletSignatureGuard } from '../../guards/walletSignature.guard';
 import { UsersFollowsWalletDto } from './users-follows.dto';
-import { UsersFollows } from './users-follows.entity';
 
 @ApiTags('users')
 @Controller('users')
@@ -34,60 +32,69 @@ export class UsersController {
 
   @Post('/:walletAddress/follow')
   async followUser(@Param('walletAddress') walletAddress: string, @Body() followingAddress: UsersFollowsWalletDto) {
-    if (walletAddress === followingAddress.walletAddress) throw new NotFoundException["You can't follow yourself"]();
+    if (walletAddress === followingAddress.walletAddress) {
+      throw new BadRequestException("You can't follow yourself");
+    }
 
     const currentUser = await this.userService.findByAddress(walletAddress);
-    if (!currentUser) throw NotFoundException['user not found']();
+    if (!currentUser) throw new BadRequestException('user not found');
 
     const followingUser = await this.userService.findByAddress(followingAddress.walletAddress);
-    if (!followingUser) throw NotFoundException['user not found']();
+    if (!followingUser) {
+      throw new BadRequestException('user not found');
+    }
 
-    const isAlreadyFollowing = await this.userService.isAlreadyFollowing({
+    const userFound = await this.userService.userFound({
       followerId: currentUser.id,
       followingId: followingUser.id,
     });
 
-    if (isAlreadyFollowing) throw new ConflictException['Already followed']();
+    if (userFound) {
+      throw new BadRequestException('Already followed');
+    }
+
+    await this.userService.createFollow({
+      followerId: currentUser.id,
+      followerAddress: currentUser.walletAddress,
+      followingId: followingUser.id,
+      followingAddress: followingUser.walletAddress,
+    });
 
     Promise.all([
       await this.userService.increment({ id: currentUser.id, column: 'followingCount' }),
       await this.userService.increment({ id: followingUser.id, column: 'followerCount' }),
     ]);
-
-    const follow = new UsersFollows();
-    follow.follower = currentUser;
-    follow.following = followingUser;
-
-    await this.userService.userFollow(follow);
   }
 
-  @Post('/:walletAddress/follow')
-  async unFollowUser(@Param('walletAddress') walletAddress: string, @Body() followingAddress: UsersFollowsWalletDto) {
-    if (walletAddress === followingAddress.walletAddress) throw new ConflictException["You can't follow yourself"]();
+  @Delete('/:walletAddress/unfollow')
+  async unFollowUser(
+    @Param('walletAddress') walletAddress: string,
+    @Body()
+    followingAddress: UsersFollowsWalletDto,
+  ) {
+    if (walletAddress === followingAddress.walletAddress) {
+      throw new BadRequestException("You can't follow yourself");
+    }
 
     const currentUser = await this.userService.findByAddress(followingAddress.walletAddress);
-    if (!currentUser) throw NotFoundException['user not found']();
+    if (!currentUser) {
+      throw new BadRequestException('user not found');
+    }
 
     const followingUser = await this.userService.findByAddress(walletAddress);
-    if (!followingUser) throw ConflictException['user not found']();
+    if (!followingUser) {
+      throw new BadRequestException('user not found');
+    }
 
-    const isAlreadyFollowing = await this.userService.isAlreadyFollowing({
-      followerId: currentUser.id,
-      followingId: followingUser.id,
-    });
+    const unfollow = await this.userService.deleteFollow({ followerId: currentUser.id, followingId: followingUser.id });
 
-    if (!isAlreadyFollowing) throw new ConflictException['Not followed yet']();
-
+    if (!unfollow.affected) {
+      throw new BadRequestException('You are not a follower of this user');
+    }
     Promise.all([
       await this.userService.decrement({ id: currentUser.id, column: 'followingCount' }),
       await this.userService.decrement({ id: followingUser.id, column: 'followerCount' }),
     ]);
-
-    const follow = new UsersFollows();
-    follow.follower = currentUser;
-    follow.following = followingUser;
-
-    await this.userService.userFollow(follow);
   }
 
   @Put('/profile')
