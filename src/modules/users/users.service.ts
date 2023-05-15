@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { Injectable} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DeleteResult, UpdateResult } from 'typeorm';
 
 import { UsersRepository } from './users.repository';
