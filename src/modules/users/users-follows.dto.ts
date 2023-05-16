@@ -1,6 +1,6 @@
 import { IsString } from 'class-validator';
 
-export class UsersFollowsWalletDto {
+export class UserFollowDto {
   @IsString()
   walletAddress: string;
 

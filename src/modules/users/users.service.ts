@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import { Injectable } from '@nestjs/common';
 import { DeleteResult, UpdateResult } from 'typeorm';
-
 import { UsersRepository } from './users.repository';
 import { User } from './users.entity';
 import { UsersFollowRepository } from './users-follows.repository';
@@ -80,7 +79,7 @@ export class UsersService {
     });
   }
 
-  async userFound({ followerId, followingId }: { followerId: number; followingId: number }) {
+  async findOneFollow({ followerId, followingId }: { followerId: number; followingId: number }): Promise<UsersFollows> {
     const follow = await this.usersFollowRepository.findOne({
       where: {
         followerId,
@@ -88,7 +87,7 @@ export class UsersService {
       },
     });
 
-    return !!follow;
+    return follow;
   }
 
   async createFollow(follow: Partial<UsersFollows>): Promise<UsersFollows> {
