@@ -27,7 +27,7 @@ export class ArticlesCommentsController {
   async updateComment(@Param('commentId') commentId: number, @Body() commentData: UpdateCommentDto) {
     const comment = await this.articlesCommentsService.fetchComment(commentId);
     if (!comment) throw new BadRequestException('Comment not found');
-    if (comment.authorAddress != commentData.authorAddress) {
+    if (comment.authorAddress !== commentData.authorAddress) {
       throw new BadRequestException(`${commentData.authorAddress} is not the author of this comment`);
     }
     return this.articlesCommentsService.updateComment(commentId, commentData);

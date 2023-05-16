@@ -130,7 +130,6 @@ export class ArticlesService {
   }
 
   updateArticle(id: number, data: Partial<Article>): Promise<UpdateResult> {
-    //@ts-ignore
     return this.articleRepository.update(id, {
       ...data,
       status: 'published',
