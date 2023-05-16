@@ -1,34 +1,40 @@
-import { Body, Controller, Delete, Get, Post, Put } from '@nestjs/common';
-import { CommentsService } from './articles-comments.service';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { ArticlesCommentsService } from './articles-comments.service';
 import { CreateCommentDto, UpdateCommentDto } from './articles-comments.dto';
+import { ArticleComment } from './articles-comments.entity';
 
 @Controller('comments')
-export class CommentsController {
-    constructor(
-        private readonly commentsService:CommentsService
-    ) {}
-    @Get('/')
-    async fetchAllComments(@Body() {articleId}:{articleId:number}) {
-        return this.commentsService.fetchAllComments(articleId)
-    }
+export class ArticlesCommentsController {
+  constructor(private readonly articlesCommentsService: ArticlesCommentsService) {}
+  @Get('/')
+  async fetchAllComments(@Body() { articleId }: { articleId: number }) {
+    return this.articlesCommentsService.fetchAllComments(articleId);
+  }
 
-    @Get('/comment')
-    async fetchComment(@Body() {commentId}:{commentId:number}) {
-        return this.commentsService.fetchComment(commentId)
-    }
+  @Get('/:commentId')
+  async fetchComment(@Param('commentId') commentId: number): Promise<ArticleComment> {
+    const comment = await this.articlesCommentsService.fetchComment(commentId);
+    if (!comment) throw new BadRequestException('Comment not found');
+    return comment;
+  }
 
-    @Post('/comment')
-    async createComment(@Body() commentData:CreateCommentDto) {
-        return this.commentsService.createComment(commentData)
-    }
+  @Post('/:articleId')
+  async createComment(@Param('articleId') articleId: number, @Body() commentData: CreateCommentDto) {
+    return this.articlesCommentsService.saveComment(articleId, commentData);
+  }
 
-    @Put('/comment')
-    async updateComment(@Body() commentData:UpdateCommentDto) {
-        return this.commentsService.updateComment(commentData)
+  @Put('/:commentId')
+  async updateComment(@Param('commentId') commentId: number, @Body() commentData: UpdateCommentDto) {
+    const comment = await this.articlesCommentsService.fetchComment(commentId);
+    if (!comment) throw new BadRequestException('Comment not found');
+    if (comment.authorAddress != commentData.authorAddress) {
+      throw new BadRequestException(`${commentData.authorAddress} is not the author of this comment`);
     }
+    return this.articlesCommentsService.updateComment(commentId, commentData);
+  }
 
-    @Delete('/comment')
-    async deleteComment(@Body() {commentId}:{commentId:number}) {
-        return this.commentsService.deleteComment(commentId)
-    }
+  @Delete('/:commentId')
+  async deleteComment(@Param('commentId') commentId: number) {
+    return this.articlesCommentsService.deleteComment(commentId);
+  }
 }

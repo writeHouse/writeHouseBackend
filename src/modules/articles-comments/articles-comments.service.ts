@@ -1,67 +1,54 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCommentDto, UpdateCommentDto } from './articles-comments.dto';
-import { CommentRepository } from './articles-comments.repository';
-import { Comment } from './articles-comments.entity';
+import { ArticlesCommentsRepository } from './articles-comments.repository';
+import { ArticleComment } from './articles-comments.entity';
+import { ArticleRepository } from '../articles/articles.repository';
 
 @Injectable()
-export class CommentsService {
+export class ArticlesCommentsService {
+  constructor(
+    public articlesCommentsRepository: ArticlesCommentsRepository,
+    public readonly articlesRepository: ArticleRepository,
+  ) {}
 
-    constructor(
-        public commentRepository:CommentRepository
-    ) {}
+  async fetchAllComments(articleId: number) {
+    const article = await this.articlesRepository.findOne({
+      where: {
+        id: articleId,
+      },
+    });
+    if (!article) throw new BadRequestException('Article not found');
+    return await this.articlesCommentsRepository.find({ where: { articleId } });
+  }
 
-    async fetchAllComments(articleId:number) {
-        try {
-          return await this.commentRepository.find({articleId}) 
-        } catch(err) {
-            throw new BadRequestException(err.message)
-        }
-        
-    }
+  async fetchComment(commentId: number) {
+    return await this.articlesCommentsRepository.findOne({
+      where: {
+        id: commentId,
+      },
+    });
+  }
 
-    async fetchComment(commentId:number) {
-        try {
-           return await this.commentRepository.findOneOrFail({id:commentId}) 
-        } catch(err) {
-            throw new BadRequestException(err.message)
-        }
-        
-    }
+  async deleteComment(commentId: number) {
+    return await this.articlesCommentsRepository.delete({ id: commentId });
+  }
 
-    async deleteComment(commentId:number) {
-        try {
-          return await this.commentRepository.delete({id:commentId})  
-        } catch(err) {
-            throw new BadRequestException(err.message)
-        }
-        
-    }
+  async saveComment(articleId: number, commentData: CreateCommentDto) {
+    const article = await this.articlesRepository.findOne({
+      where: {
+        id: articleId,
+      },
+    });
+    if (!article) throw new BadRequestException('Article not found');
+    const comment = new ArticleComment();
+    comment.articleId = articleId;
+    comment.authorAddress = commentData.authorAddress;
+    comment.authorId = commentData.authorId;
+    comment.body = commentData.body;
+    return await this.articlesCommentsRepository.save(comment);
+  }
 
-    async createComment(commentData:CreateCommentDto) {
-        try {
-            const comment = new Comment()
-            comment.articleId = commentData.articleId
-            comment.authorAddress = commentData.authorAddress 
-            comment.authorId = commentData.authorId
-            comment.body = commentData.body
-            return await this.commentRepository.save(comment)
-        } catch(err) {
-            throw new BadRequestException(err.message)
-        }
-        
-    }
-
-    async updateComment(commentData:UpdateCommentDto) {
-        try {
-            const comment = await this.commentRepository.findOneOrFail({id:commentData.id})
-            if(comment.authorAddress != commentData.authorAddress) {
-                throw new BadRequestException({author:commentData.authorAddress},'Not the author of this comment')
-            }
-            return await this.commentRepository.update({id:commentData.id}, {body:commentData.body})
-        } catch(err) {
-            throw new BadRequestException(err.message)
-        }
-        
-    }
-
+  async updateComment(commentId: number, commentData: UpdateCommentDto) {
+    return await this.articlesCommentsRepository.update({ id: commentId }, { body: commentData.body });
+  }
 }

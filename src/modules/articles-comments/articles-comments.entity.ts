@@ -1,21 +1,13 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-  CreateDateColumn,
-  ManyToOne,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, UpdateDateColumn, CreateDateColumn, ManyToOne } from 'typeorm';
 import { Article } from '../articles/articles.entity';
 
-
-@Entity({name:'articles_comments'})
-export class Comment {
+@Entity({ name: 'articles_comments' })
+export class ArticleComment {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   readonly id: number;
 
-  @Column({type:'varchar'})
-  body:string;
+  @Column({ type: 'varchar' })
+  body: string;
 
   @Column({ type: 'int8' })
   authorId: number;
@@ -26,11 +18,11 @@ export class Comment {
   @Column({ type: 'varchar' })
   articleId: number;
 
-  @Column({ type: 'bool', default:true })
+  @Column({ type: 'bool', default: true })
   active: boolean;
 
-  @ManyToOne(() => Article, (article:Article) => article.comments)
-  article: Article
+  @ManyToOne(() => Article, (article: Article) => article.comments)
+  article: Article;
 
   @CreateDateColumn({
     default: () => new Date(),

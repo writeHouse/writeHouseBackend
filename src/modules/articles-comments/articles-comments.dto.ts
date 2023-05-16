@@ -1,29 +1,23 @@
-import { IsBoolean, IsNumber, IsString } from "class-validator"
+import { IsBoolean, IsNumber, IsString } from 'class-validator';
 
 export class CreateCommentDto {
-    @IsString()
-    body:string
+  @IsString()
+  body: string;
 
-    @IsNumber()
-    authorId:number 
+  @IsNumber()
+  authorId: number;
 
-    @IsString()
-    authorAddress:string 
+  @IsString()
+  authorAddress: string;
 
-    @IsNumber()
-    articleId:number 
-
-    @IsBoolean()
-    active:boolean 
+  @IsBoolean()
+  active: boolean;
 }
 
 export class UpdateCommentDto {
-    @IsNumber()
-    id:number 
+  @IsString()
+  body: string;
 
-    @IsString()
-    body:string
-
-    @IsString()
-    authorAddress:string 
+  @IsString()
+  authorAddress: string;
 }
