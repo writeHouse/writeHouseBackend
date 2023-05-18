@@ -84,6 +84,7 @@ export class UsersService {
   }
 
   updateById(id: number, data: Partial<User>): Promise<UpdateResult> {
+    //@ts-ignore
     return this.userRepository.update(id, data);
   }
 
