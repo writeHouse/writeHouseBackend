@@ -10,6 +10,8 @@ import {
   CacheTTL,
   Query,
   UseGuards,
+  Post,
+  Delete,
 } from '@nestjs/common';
 
 import { ApiTags } from '@nestjs/swagger';
@@ -19,11 +21,83 @@ import { Web3Helper } from '../../utils/web3Helper';
 import { isValidAddress } from '../../utils/utils';
 import logger from '../../utils/logger';
 import { WalletSignatureGuard } from '../../guards/walletSignature.guard';
+import { UserFollowDto } from './users-follows.dto';
 
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
+
+  @Post('/:walletAddress/follow')
+  async followUser(@Param('walletAddress') walletAddress: string, @Body() userFollowData: UserFollowDto) {
+    if (walletAddress.toLowerCase() === userFollowData.walletAddress.toLowerCase()) {
+      throw new BadRequestException('You cannot follow yourself');
+    }
+
+    const currentUser = await this.userService.findByAddress(walletAddress);
+    if (!currentUser) throw new BadRequestException('user not found');
+
+    const followingUser = await this.userService.findByAddress(userFollowData.walletAddress);
+    if (!followingUser) {
+      throw new BadRequestException('user not found');
+    }
+
+    const foundFollower = await this.userService.findOneFollow({
+      followerId: currentUser.id,
+      followingId: followingUser.id,
+    });
+
+    if (foundFollower) {
+      throw new BadRequestException('Already followed');
+    }
+
+    await this.userService.createFollow({
+      followerId: currentUser.id,
+      followerAddress: currentUser.walletAddress,
+      followingId: followingUser.id,
+      followingAddress: followingUser.walletAddress,
+    });
+
+    Promise.all([
+      await this.userService.increment({ id: currentUser.id, column: 'followingCount' }),
+      await this.userService.increment({ id: followingUser.id, column: 'followerCount' }),
+    ]);
+  }
+
+  @Delete('/:walletAddress/unfollow')
+  async unFollowUser(
+    @Param('walletAddress') walletAddress: string,
+    @Body()
+    userUnFollowData: UserFollowDto,
+  ) {
+    if (walletAddress.toLowerCase() === userUnFollowData.walletAddress.toLowerCase()) {
+      throw new BadRequestException('You cannot unfollow yourself');
+    }
+
+    const currentUser = await this.userService.findByAddress(userUnFollowData.walletAddress);
+    if (!currentUser) {
+      throw new BadRequestException('User not found');
+    }
+
+    const followingUser = await this.userService.findByAddress(walletAddress);
+    if (!followingUser) {
+      throw new BadRequestException('User not found');
+    }
+
+    const unfollow = await this.userService.deleteFollow({
+      followerId: currentUser.id,
+      followingId: followingUser.id,
+    });
+
+    if (!unfollow.affected) {
+      throw new BadRequestException('You are not a follower of this user');
+    }
+
+    Promise.all([
+      await this.userService.decrement({ id: currentUser.id, column: 'followingCount' }),
+      await this.userService.decrement({ id: followingUser.id, column: 'followerCount' }),
+    ]);
+  }
 
   @Put('/profile')
   @UseGuards(WalletSignatureGuard)
