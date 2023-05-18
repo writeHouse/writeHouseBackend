@@ -89,7 +89,7 @@ export class UsersService {
   }
 
   updateByAddress(walletAddress: string, data: Partial<User>): Promise<UpdateResult> {
-    return this.userRepository.update({ walletAddress }, data);
+    return this.userRepository.update({ walletAddress }, data); 
   }
 
   increment({ id, column, by = 1 }: { id: number; column: keyof User; by?: number }): Promise<UpdateResult> {
