@@ -17,7 +17,7 @@ export class ArticlesCommentsService {
         id: articleId,
       },
     });
-    if (!article) throw new BadRequestException('Article not found');
+    if (!article) throw new BadRequestException('Article not found.');
     return await this.articlesCommentsRepository.find({ where: { articleId } });
   }
 
@@ -39,7 +39,7 @@ export class ArticlesCommentsService {
         id: articleId,
       },
     });
-    if (!article) throw new BadRequestException('Article not found');
+    if (!article) throw new BadRequestException('Article not found.');
     const comment = new ArticleComment();
     comment.articleId = articleId;
     comment.authorAddress = commentData.authorAddress;
