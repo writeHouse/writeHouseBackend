@@ -5,13 +5,10 @@ export class CreateCommentDto {
   body: string;
 
   @IsNumber()
-  authorId: number;
+  baseID: string;
 
   @IsString()
-  authorAddress: string;
-
-  @IsBoolean()
-  active: boolean;
+  walletAddress: string;
 }
 
 export class UpdateCommentDto {
@@ -19,5 +16,5 @@ export class UpdateCommentDto {
   body: string;
 
   @IsString()
-  authorAddress: string;
+  walletAddress: string;
 }

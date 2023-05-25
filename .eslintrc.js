@@ -42,5 +42,6 @@ module.exports = {
     'lines-between-class-members': 'off',
     'consistent-return': 'off',
     'no-unused-vars': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
   },
 };

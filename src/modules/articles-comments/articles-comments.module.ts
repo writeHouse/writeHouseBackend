@@ -4,10 +4,14 @@ import { ArticlesCommentsService } from './articles-comments.service';
 import { ArticlesCommentsController } from './articles-comments.controller';
 import { ArticlesCommentsRepository } from './articles-comments.repository';
 import { ArticleRepository } from '../articles/articles.repository';
+import { UsersService } from '../users/users.service';
+import { ArticlesService } from '../articles/articles.service';
+import { UsersRepository } from '../users/users.repository';
+import { Web3Config } from '../../config/web3/config.web3.initializer';
 
 @Module({
-  providers: [ArticlesCommentsService],
+  providers: [ArticlesCommentsService, UsersService, ArticlesService, Web3Config],
   controllers: [ArticlesCommentsController],
-  imports: [TypeOrmModule.forFeature([ArticlesCommentsRepository, ArticleRepository])],
+  imports: [TypeOrmModule.forFeature([ArticlesCommentsRepository, ArticleRepository, UsersRepository])],
 })
 export class ArticlesCommentsModule {}

@@ -1,54 +1,72 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateCommentDto, UpdateCommentDto } from './articles-comments.dto';
+import { Injectable } from '@nestjs/common';
+import { DeleteResult, UpdateResult } from 'typeorm';
+import dayjs from 'dayjs';
+import { isEmpty } from 'lodash';
 import { ArticlesCommentsRepository } from './articles-comments.repository';
 import { ArticleComment } from './articles-comments.entity';
-import { ArticleRepository } from '../articles/articles.repository';
 
 @Injectable()
 export class ArticlesCommentsService {
-  constructor(
-    public articlesCommentsRepository: ArticlesCommentsRepository,
-    public readonly articlesRepository: ArticleRepository,
-  ) {}
+  constructor(public readonly articlesCommentsRepository: ArticlesCommentsRepository) {}
 
-  async fetchAllComments(articleId: number) {
-    const article = await this.articlesRepository.findOne({
-      where: {
-        id: articleId,
+  async fetchAllComments({ articleId, limit, page }: { articleId: number; limit: number; page: number }) {
+    const take = limit;
+    const skip = (page - 1) * take;
+
+    const [comments, totalComments] = await this.articlesCommentsRepository.findAndCount({
+      where: { articleId },
+      order: {
+        id: 'DESC',
       },
+      take,
+      skip,
     });
-    if (!article) throw new BadRequestException('Article not found.');
-    return await this.articlesCommentsRepository.find({ where: { articleId } });
+
+    if (isEmpty(comments)) {
+      return {
+        meta: {
+          limit,
+          currentPage: 1,
+          totalPages: 0,
+          totalProposals: 0,
+        },
+        claims: [],
+      };
+    }
+
+    return {
+      meta: {
+        limit,
+        currentPage: page,
+        totalPages: Math.ceil(totalComments / take),
+        totalComments,
+      },
+      comments,
+    };
   }
 
-  async fetchComment(commentId: number) {
-    return await this.articlesCommentsRepository.findOne({
+  async findById(commentId: number): Promise<ArticleComment> {
+    return this.articlesCommentsRepository.findOne({
       where: {
         id: commentId,
       },
     });
   }
 
-  async deleteComment(commentId: number) {
-    return await this.articlesCommentsRepository.delete({ id: commentId });
+  delete(commentId: number): Promise<DeleteResult> {
+    return this.articlesCommentsRepository.delete({ id: commentId });
   }
 
-  async saveComment(articleId: number, commentData: CreateCommentDto) {
-    const article = await this.articlesRepository.findOne({
-      where: {
-        id: articleId,
-      },
+  save(data: Partial<ArticleComment>): Promise<ArticleComment> {
+    return this.articlesCommentsRepository.save({
+      ...data,
+      createdAt: dayjs().format(),
+      updatedAt: dayjs().format(),
     });
-    if (!article) throw new BadRequestException('Article not found.');
-    const comment = new ArticleComment();
-    comment.articleId = articleId;
-    comment.authorAddress = commentData.authorAddress;
-    comment.authorId = commentData.authorId;
-    comment.body = commentData.body;
-    return await this.articlesCommentsRepository.save(comment);
   }
 
-  async updateComment(commentId: number, commentData: UpdateCommentDto) {
-    return await this.articlesCommentsRepository.update({ id: commentId }, { body: commentData.body });
+  update(commentId: number, commentData: Partial<ArticleComment>): Promise<UpdateResult> {
+    // @ts-ignore
+    return this.articlesCommentsRepository.update({ id: commentId }, commentData);
   }
 }
