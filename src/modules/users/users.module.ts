@@ -6,6 +6,7 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { UsersRepository } from './users.repository';
 import { UsersFollowRepository } from './users-follows.repository';
+import { PublicationsRepository } from '../publications/publications.repository';
 
 @Module({
   imports: [TypeOrmModule.forFeature([UsersRepository, UsersFollowRepository]), HttpModule],
