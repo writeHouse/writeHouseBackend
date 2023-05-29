@@ -3,14 +3,13 @@ import { SupportedChain } from 'src/constants/shared';
 
 export class CreatePublicationDto {
   @IsString()
-  @IsOptional()
+  @IsNotEmpty()
   creatorAddress: string;
 
   @IsNotEmpty()
   title: string;
 
   @IsString()
-  @MinLength(50)
   description: string;
 
   @IsString()

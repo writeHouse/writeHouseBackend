@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Post, Query, Req } from '@nestjs/common';
 import { slugGenerator } from 'src/utils/slug.generator';
 import { PublicationsService } from './publications.service';
 import { CreatePublicationDto } from './dto/create.publications.dto';
@@ -14,9 +14,10 @@ export class PublicationsController {
   }
 
   @Post('/')
-  async createPublications(@Body() publicationData: CreatePublicationDto) {
+  async createPublications(@Body() publicationData: CreatePublicationDto, @Req() req) {
+    const { polyglot } = req;
+
     const { title } = publicationData;
-    // const walletAddress = req.user.walletAddress
 
     const currentUser = await this.usersService.findByAddress(publicationData.creatorAddress);
 
@@ -32,10 +33,13 @@ export class PublicationsController {
       description: title,
       creatorId: currentUser.id,
       creatorAddress: currentUser.walletAddress,
-      title_search: `${title} ${currentUser.walletAddress}`,
-      description_search: `${title} ${currentUser.walletAddress}`,
+      title_search: `${title} ${currentUser.walletAddress}`.toLowerCase(),
+      description_search: `${title} ${currentUser.walletAddress}`.toLowerCase(),
     });
 
-    return { publication };
+    return {
+      message: polyglot.t('publication created successfully'),
+      publication,
+    };
   }
 }

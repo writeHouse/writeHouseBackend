@@ -30,6 +30,18 @@ export class PublicationsService {
       skip,
     });
 
+    if (isEmpty(publications)) {
+      return {
+        meta: {
+          limit,
+          currentPage: 1,
+          totalPages: 0,
+          totalPublications: 0,
+        },
+        publications: [],
+      };
+    }
+
     return {
       meta: {
         limit,
