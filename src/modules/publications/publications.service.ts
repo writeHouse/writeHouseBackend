@@ -52,4 +52,8 @@ export class PublicationsService {
       publications,
     };
   }
+
+  async getPublication(slug: string): Promise<Publication> {
+    return await this.publicationsRepository.findOne({ slug }, { relations: ['articles'] });
+  }
 }
