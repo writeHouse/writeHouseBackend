@@ -14,9 +14,9 @@ export class PublicationsController {
     return await this.publicationsService.fetchAllPublications({ limit, page });
   }
 
-  @Get(':slug')
-  async findBySlug(@Param('slug') slug: string, @Req() req) {
-    const publication = await this.publicationsService.findBySlug(slug);
+  @Get('/:slug')
+  async getPublication(@Param('slug') slug: string, @Req() req) {
+    const publication = await this.publicationsService.getPublication(slug);
 
     const { polyglot } = req;
 
@@ -25,6 +25,10 @@ export class PublicationsController {
     }
 
     const { articles } = publication;
+    if (!articles) {
+      return publication;
+    }
+
     const highPrice = Math.max(...articles.map((article) => article.price));
     const floorPrice = Math.min(...articles.map((article) => article.price));
     const ownerTotalNumber = new Set(articles.map((article) => article.ownerId)).size;
