@@ -8,9 +8,19 @@ import { UsersService } from '../users/users.service';
 import { Web3Config } from '../../config/web3/config.web3.initializer';
 import { ArticlesHistoryService } from '../articles-history/articles-history.service';
 import { ArticleHistoryRepository } from '../articles-history/articles-history.repository';
+import { UsersFollowRepository } from '../users/users-follows.repository';
+import { PublicationsRepository } from '../publications/publications.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UsersRepository, ArticleRepository, ArticleHistoryRepository])],
+  imports: [
+    TypeOrmModule.forFeature([
+      UsersRepository,
+      ArticleRepository,
+      ArticleHistoryRepository,
+      UsersFollowRepository,
+      PublicationsRepository,
+    ]),
+  ],
   controllers: [ArticlesController],
   providers: [ArticlesService, UsersService, ArticlesHistoryService, Web3Config],
 })
