@@ -16,7 +16,7 @@ export class PublicationsController {
 
   @Get('/:slug')
   async getPublication(@Param('slug') slug: string, @Req() req) {
-    const publication = await this.publicationsService.getPublication(slug);
+    const publication = await this.publicationsService.findBySlug(slug);
 
     const { polyglot } = req;
 

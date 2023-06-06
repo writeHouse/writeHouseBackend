@@ -14,6 +14,7 @@ export class WalletSignatureGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const [req] = context.getArgs();
+    const roles = this.reflector.get<string[]>('roles', context.getHandler());
     const signature = req.body.signature || req.headers.signature;
     const walletAddress = req.body.walletAddress || Web3Helper.getAddressChecksum(req.headers.address as string);
     const data = req.body;
@@ -36,6 +37,7 @@ export class WalletSignatureGuard implements CanActivate {
     }
 
     const foundUser = await this.userRepository.findOne({
+      relations: ['userRoles', 'userRoles.role'],
       where: {
         walletAddress,
       },
@@ -44,6 +46,14 @@ export class WalletSignatureGuard implements CanActivate {
     if (!foundUser) {
       logger.error('user not found', {
         data,
+      });
+      return false;
+    }
+
+    if (roles?.length > 0 && !foundUser.userRoles.some((role) => roles.includes(role?.role?.name))) {
+      logger.error('wrong role access', {
+        data,
+        roles,
       });
       return false;
     }

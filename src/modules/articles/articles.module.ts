@@ -10,6 +10,7 @@ import { ArticlesHistoryService } from '../articles-history/articles-history.ser
 import { ArticleHistoryRepository } from '../articles-history/articles-history.repository';
 import { UsersFollowRepository } from '../users/users-follows.repository';
 import { PublicationsRepository } from '../publications/publications.repository';
+import { EventLogRepository } from '../events-logs/events-logs.repository';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { PublicationsRepository } from '../publications/publications.repository'
       ArticleHistoryRepository,
       UsersFollowRepository,
       PublicationsRepository,
+      EventLogRepository,
     ]),
   ],
   controllers: [ArticlesController],
