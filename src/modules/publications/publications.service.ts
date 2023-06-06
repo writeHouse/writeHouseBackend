@@ -8,7 +8,7 @@ import { CreatePublicationDto } from './dto/create.publications.dto';
 
 @Injectable()
 export class PublicationsService {
-  constructor(private publicationsRepository: PublicationsRepository) {}
+  constructor(private publicationsRepository: PublicationsRepository) { }
 
   save(data: Partial<Publication>): Promise<Publication> {
     return this.publicationsRepository.save({
