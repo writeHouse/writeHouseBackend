@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, UpdateDateColumn, CreateDateCol
 import { ArticleHistory } from '../articles-history/articles-history.entity';
 import { Article } from '../articles/articles.entity';
 import { UsersFollows } from './users-follows.entity';
+import { UserRole } from './users-roles.entity';
 
 @Entity('users')
 export class User {
@@ -77,12 +78,6 @@ export class User {
   @Column({ nullable: true, type: 'bool', default: true })
   leaderboard: boolean;
 
-  @Column({ nullable: true, type: 'int8', default: 0 })
-  followId: number;
-
-  @Column({ nullable: true, type: 'int8', default: 0 })
-  followingId: number;
-
   @Column({ nullable: true, type: 'int4', default: 0 })
   followerCount: number;
 
@@ -118,6 +113,9 @@ export class User {
 
   @OneToMany(() => UsersFollows, (userFollow: UsersFollows) => userFollow.following)
   public followings: UsersFollows[];
+
+  @OneToMany(() => UserRole, (userRole: UserRole) => userRole.user)
+  public userRoles!: UserRole[] | Array<string>;
 
   @CreateDateColumn({
     type: 'timestamp',

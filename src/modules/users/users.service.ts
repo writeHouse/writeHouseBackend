@@ -95,6 +95,7 @@ export class UsersService {
   }
 
   async deleteFollow(follow: Partial<UsersFollows>): Promise<DeleteResult> {
+    // @ts-ignore
     return await this.usersFollowRepository.delete(follow);
   }
 
