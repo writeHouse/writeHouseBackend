@@ -9,7 +9,6 @@ import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './modules/users/users.module';
 import { ArticlesModule } from './modules/articles/articles.module';
 import { ArticlesHistoryModule } from './modules/articles-history/articles-history.module';
-import { ArticlesCommentsModule } from './modules/articles-comments/articles-comments.module';
 import { PublicationsModule } from './modules/publications/publications.module';
 
 @Module({
@@ -25,7 +24,6 @@ import { PublicationsModule } from './modules/publications/publications.module';
     UsersModule,
     ArticlesModule,
     ArticlesHistoryModule,
-    ArticlesCommentsModule,
     PublicationsModule,
   ],
   controllers: [AppController],

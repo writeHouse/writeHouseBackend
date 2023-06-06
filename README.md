@@ -12,6 +12,7 @@ The WriteHouse Backend is an API that serves a Web 3 blog web app
 - EthersJS
 - Web3JS
 
+
 ## Setup
 
 - Clone the repo
@@ -42,3 +43,4 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+
