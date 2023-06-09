@@ -128,8 +128,7 @@ export class ArticlesService {
     }
   }
 
-
-  async validateListingStatus(data : UpdateNftListingStatusDto, article: Partial<Article>): Promise<boolean> {
+  async validateListingStatus(data: UpdateNftListingStatusDto, article: Partial<Article>): Promise<boolean> {
     logger.info('VALIDATING_LISTING_STATUS_TX', article);
     try {
       const { setIsListed, listingUpdateTxHash } = data;

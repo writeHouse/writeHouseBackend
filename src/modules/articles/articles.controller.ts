@@ -1,4 +1,16 @@
-import { BadRequestException, Body, Controller, Get, NotFoundException, Param, Patch, Post, Put, Query, Req } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
+  Req,
+} from '@nestjs/common';
 import { SaleType } from '../articles-history/articles-history.entity';
 import { ArticlesHistoryService } from '../articles-history/articles-history.service';
 import { UsersService } from '../users/users.service';
@@ -90,35 +102,26 @@ export class ArticlesController {
   }
 
   @Put('/:baseID/listed')
-  async ArticleListingStatus(
-    @Param('baseID') baseID: string,
-    @Body() data : UpdateNftListingStatusDto,
-    @Req() req
-    ){
+  async ArticleListingStatus(@Param('baseID') baseID: string, @Body() data: UpdateNftListingStatusDto, @Req() req) {
+    const { polyglot } = req;
 
-      const { polyglot } = req;
+    const article = await this.articlesService.findByBaseId(baseID);
 
-      const article = await this.articlesService.findByBaseId(baseID)
+    if (!article) {
+      return new NotFoundException(polyglot.t('Article not found'));
+    }
 
-      if(!article){
-        return new NotFoundException(polyglot.t('Article not found'))
-      }
+    const isValidTrasanction = this.articlesService.validateListingStatus(data, article);
 
-      const isValidTrasanction = this.articlesService.validateListingStatus(data, article)
+    if (!isValidTrasanction) {
+      throw new BadRequestException(polyglot.t('Invalid listing status transaction'));
+    }
 
-      if(!isValidTrasanction){
-        throw new BadRequestException(polyglot.t('Invalid listing status transaction'))
-      }
+    await this.articlesService.updateArticle(article.id, {
+      listed: data.setIsListed,
+      listedOnChain: true,
+    });
 
-      await this.articlesService.updateArticle(article.id, {
-        listed: data.setIsListed,
-        listedOnChain: true,
-      })
-
-      return 'Article listing status updated successfully';
-
-
-
+    return 'Article listing status updated successfully';
   }
-
 }
