@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { logger } from '../../utils/logger';
 import { LogType, Web3Helper, Web3Service } from '../../utils/web3Helper';
 import { UsersRepository } from '../users/users.repository';
-import { CreateArticleDto } from './articles.dto';
+import { CreateArticleDto, UpdateNftListingStatusDto } from './articles.dto';
 import { Article } from './articles.entity';
 import { ArticleRepository } from './articles.repository';
 import { Web3Config } from '../../config/web3/config.web3.initializer';
@@ -124,6 +124,71 @@ export class ArticlesService {
       return true;
     } catch (error) {
       logger.error('VALIDATE_MINT_TRANSACTION_ERR error', { trxData, error });
+      return false;
+    }
+  }
+
+
+  async validateListingStatus(data : UpdateNftListingStatusDto, article: Partial<Article>): Promise<boolean> {
+    logger.info('VALIDATING_LISTING_STATUS_TX', article);
+    try {
+      const { setIsListed, listingUpdateTxHash } = data;
+      const { chain, tokenID, id, authorId } = article;
+      const { web3, marketContractAddress } = this.web3Config.getWeb3Params(chain);
+      const web3Service = new Web3Service(web3);
+
+      await this.checkReplayAttack(listingUpdateTxHash);
+
+      const transactionReceipt = await web3.eth.getTransactionReceipt(listingUpdateTxHash.toLowerCase());
+
+      if (!transactionReceipt?.blockHash || !transactionReceipt?.blockNumber || !transactionReceipt?.status) {
+        logger.warn('Transaction failed or might still be pending', {
+          blockHash: transactionReceipt?.blockHash,
+          blockNumber: transactionReceipt?.blockNumber,
+          status: transactionReceipt?.status,
+        });
+        return false;
+      }
+
+      if (marketContractAddress.toLowerCase() !== transactionReceipt?.to.toLowerCase()) {
+        logger.warn('Sent to the wrong contract address', {
+          to: transactionReceipt?.to,
+          from: transactionReceipt?.from,
+        });
+        return false;
+      }
+
+      const listingStatusDecodedLog = web3Service.decodeLog(transactionReceipt.logs[1], LogType.LISTING_UPDATED);
+
+      if (listingStatusDecodedLog.tokenID !== tokenID) {
+        logger.warn('VALIDATING_LISTING_STATUS_TX_FAILED - TokenID mismatch different from on-chain tokenID', {
+          onChainTokenID: listingStatusDecodedLog.tokenID,
+          nftIDUpdateTokenID: tokenID,
+        });
+        return false;
+      }
+
+      const onChainListStatus = Boolean(listingStatusDecodedLog.isListed);
+      if (onChainListStatus !== setIsListed) {
+        logger.warn('Listing status mismatch different from on-chain status', {
+          onChainListStatus,
+          nftListingUpdateStatus: setIsListed,
+        });
+        return false;
+      }
+
+      await this.eventLogRepository.save({
+        data: JSON.stringify(listingStatusDecodedLog),
+        type: 'Minted',
+        transactionHash: listingUpdateTxHash.toLowerCase(),
+        triggerAddress: transactionReceipt.from,
+        userId: authorId || null,
+        articleId: id || null,
+      });
+
+      return true;
+    } catch (error) {
+      logger.error('VALIDATE_LISTING_STATUS_TRANSACTION_ERR error', { article, error });
       return false;
     }
   }

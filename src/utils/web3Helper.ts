@@ -125,13 +125,21 @@ const priceUpdateInputs = [
 
 const listingStatusUpdateInputs = [
   {
+    indexed: true,
+    internalType: 'address',
+    name: 'owner',
+    type: 'address',
+  },
+  {
+    indexed: false,
     internalType: 'uint256',
-    name: 'tokenId',
+    name: 'tokenID',
     type: 'uint256',
   },
   {
+    indexed: false,
     internalType: 'bool',
-    name: 'shouldBeListed',
+    name: 'isListed',
     type: 'bool',
   },
 ];
