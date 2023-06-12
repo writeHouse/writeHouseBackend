@@ -119,7 +119,7 @@ export class ArticlesController {
 
     await this.articlesService.updateArticle(article.id, {
       listed: data.setIsListed,
-      listedOnChain: true,
+      listedOnChain: data.setIsListed,
     });
 
     return 'Article listing status updated successfully';
