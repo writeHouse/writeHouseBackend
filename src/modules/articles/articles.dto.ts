@@ -68,3 +68,18 @@ export class UpdateArticleTokenDto {
   @IsEnum(SupportedChain)
   chain?: SupportedChain = SupportedChain.BINANCE;
 }
+
+export class UpdateNftListingStatusDto {
+  @IsBoolean()
+  setIsListed: boolean;
+
+  @IsString()
+  ownerAddress: string;
+
+  @IsString()
+  listingUpdateTxHash: string;
+
+  @IsOptional()
+  @IsEnum(SupportedChain)
+  chain?: SupportedChain = SupportedChain.BINANCE;
+}
