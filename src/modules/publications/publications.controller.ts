@@ -7,7 +7,7 @@ import { Publication } from './publications.entity';
 
 @Controller('publications')
 export class PublicationsController {
-  constructor(private readonly publicationsService: PublicationsService, private readonly usersService: UsersService) {}
+  constructor(private readonly publicationsService: PublicationsService, private readonly usersService: UsersService) { }
 
   @Get('/')
   async fetchAllPublications(@Query() { limit = 30, page = 1 }: { limit: number; page: number }) {
@@ -47,6 +47,7 @@ export class PublicationsController {
   @Post('/')
   async createPublications(@Body() publicationData: CreatePublicationDto, @Req() req) {
     const { polyglot } = req;
+    const country = req.headers['cf-ipcountry'];
 
     const { title } = publicationData;
 
@@ -66,6 +67,7 @@ export class PublicationsController {
       creatorAddress: currentUser.walletAddress,
       title_search: `${title} ${currentUser.walletAddress}`.toLowerCase(),
       description_search: `${title} ${currentUser.walletAddress}`.toLowerCase(),
+      country:country
     });
 
     return {

@@ -57,6 +57,9 @@ export class Publication {
   @Column({ nullable: true, type: 'varchar' })
   description_search: string;
 
+  @Column({ nullable: true, type: "varchar" })
+  country: string;
+
   @ManyToOne(() => User, (creator: User) => creator.articlesCreated)
   @JoinColumn()
   creator: Partial<User>;
