@@ -14,7 +14,7 @@ import {
 import { SaleType } from '../articles-history/articles-history.entity';
 import { ArticlesHistoryService } from '../articles-history/articles-history.service';
 import { UsersService } from '../users/users.service';
-import { CreateArticleDto, UpdateArticleTokenDto, UpdateNftListingStatusDto } from './articles.dto';
+import { CreateArticleDto, UpdateArticleTokenDto, UpdateNftListingStatusDto, UpdateNftPriceDto } from './articles.dto';
 import { ArticlesService } from './articles.service';
 
 @Controller('articles')
@@ -98,6 +98,28 @@ export class ArticlesController {
     return {
       message: polyglot.t('Article token ID updated successfully'),
       article: { article, ...data },
+    };
+  }
+
+  @Put('/:baseID/price')
+  async updateNFTPrice(@Param('baseID') baseID:string, @Body() updateNFTPriceData: UpdateNftPriceDto, @Req() req ) {
+    const { polyglot } = req;
+
+    const article = await this.articlesService.findByBaseId(baseID);
+
+    if (!article) {
+      return new NotFoundException(polyglot.t('Article not found'));
+    }
+    const validatedUpdatePriceTx = await this.articlesService.validateUpdatePriceTransaction(updateNFTPriceData, article.tokenID);
+
+    if (!validatedUpdatePriceTx) {
+      throw new BadRequestException('FAILED_VALIDATED_UPDATE_PRICE_TX: Transaction could not be validated');
+    }
+    article.price = updateNFTPriceData.newPrice
+    await this.articlesService.updateArticle(article.id, article)
+    return {
+      message: polyglot.t('Article price updated successfully'),
+      article
     };
   }
 

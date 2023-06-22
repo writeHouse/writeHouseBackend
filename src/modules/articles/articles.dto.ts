@@ -83,3 +83,16 @@ export class UpdateNftListingStatusDto {
   @IsEnum(SupportedChain)
   chain?: SupportedChain = SupportedChain.BINANCE;
 }
+
+export class UpdateNftPriceDto {
+
+  @IsNumber()
+  newPrice: number;
+
+  @IsString()
+  priceUpdateTxHash: string;
+
+  @IsOptional()
+  @IsEnum(SupportedChain)
+  chain?: SupportedChain = SupportedChain.BINANCE;
+}
