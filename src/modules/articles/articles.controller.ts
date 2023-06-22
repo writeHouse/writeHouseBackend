@@ -102,7 +102,7 @@ export class ArticlesController {
   }
 
   @Put('/:baseID/price')
-  async updateNFTPrice(@Param('baseID') baseID:string, @Body() updateNFTPriceData: UpdateNftPriceDto, @Req() req ) {
+  async updateNFTPrice(@Param('baseID') baseID: string, @Body() updateNFTPriceData: UpdateNftPriceDto, @Req() req) {
     const { polyglot } = req;
 
     const article = await this.articlesService.findByBaseId(baseID);
@@ -110,16 +110,19 @@ export class ArticlesController {
     if (!article) {
       return new NotFoundException(polyglot.t('Article not found'));
     }
-    const validatedUpdatePriceTx = await this.articlesService.validateUpdatePriceTransaction(updateNFTPriceData, article.tokenID);
+    const validatedUpdatePriceTx = await this.articlesService.validateUpdatePriceTransaction(
+      updateNFTPriceData,
+      article.tokenID,
+    );
 
     if (!validatedUpdatePriceTx) {
       throw new BadRequestException('FAILED_VALIDATED_UPDATE_PRICE_TX: Transaction could not be validated');
     }
-    article.price = updateNFTPriceData.newPrice
-    await this.articlesService.updateArticle(article.id, article)
+    article.price = updateNFTPriceData.newPrice;
+    await this.articlesService.updateArticle(article.id, article);
     return {
       message: polyglot.t('Article price updated successfully'),
-      article
+      article,
     };
   }
 

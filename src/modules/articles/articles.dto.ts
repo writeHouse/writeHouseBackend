@@ -85,7 +85,6 @@ export class UpdateNftListingStatusDto {
 }
 
 export class UpdateNftPriceDto {
-
   @IsNumber()
   newPrice: number;
 

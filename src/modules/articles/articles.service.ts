@@ -249,7 +249,7 @@ export class ArticlesService {
     });
   }
 
-  async validateUpdatePriceTransaction(trxData: UpdateNftPriceDto, tokenID:string): Promise<boolean> {
+  async validateUpdatePriceTransaction(trxData: UpdateNftPriceDto, tokenID: string): Promise<boolean> {
     logger.info('VALIDATING_PRICE_UPDATE_TX', trxData);
     try {
       const { priceUpdateTxHash, chain, newPrice } = trxData;
@@ -290,5 +290,4 @@ export class ArticlesService {
       return false;
     }
   }
-
 }
