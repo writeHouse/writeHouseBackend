@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { logger } from '../../utils/logger';
 import { LogType, Web3Helper, Web3Service } from '../../utils/web3Helper';
 import { UsersRepository } from '../users/users.repository';
-import { CreateArticleDto, UpdateNftListingStatusDto } from './articles.dto';
+import { CreateArticleDto, UpdateNftListingStatusDto, UpdateNftPriceDto } from './articles.dto';
 import { Article } from './articles.entity';
 import { ArticleRepository } from './articles.repository';
 import { Web3Config } from '../../config/web3/config.web3.initializer';
@@ -247,5 +247,47 @@ export class ArticlesService {
       ...data,
       status: 'published',
     });
+  }
+
+  async validateUpdatePriceTransaction(trxData: UpdateNftPriceDto, tokenID: string): Promise<boolean> {
+    logger.info('VALIDATING_PRICE_UPDATE_TX', trxData);
+    try {
+      const { priceUpdateTxHash, chain, newPrice } = trxData;
+      const { web3, marketContractAddress } = this.web3Config.getWeb3Params(chain);
+      // const web3Service = new Web3Service(web3);
+
+      await this.checkReplayAttack(priceUpdateTxHash);
+
+      const transactionReceipt = await web3.eth.getTransactionReceipt(priceUpdateTxHash.toLowerCase());
+
+      if (!transactionReceipt?.blockHash || !transactionReceipt?.blockNumber || !transactionReceipt?.status) {
+        logger.warn('Transaction failed or might still be pending', {
+          blockHash: transactionReceipt?.blockHash,
+          blockNumber: transactionReceipt?.blockNumber,
+          status: transactionReceipt?.status,
+        });
+        return false;
+      }
+
+      if (marketContractAddress.toLowerCase() !== transactionReceipt?.to.toLowerCase()) {
+        logger.warn('Wrong contract address', {
+          to: transactionReceipt?.to,
+          from: transactionReceipt?.from,
+        });
+        return false;
+      }
+
+      await this.eventLogRepository.save({
+        data: JSON.stringify({ tokenID, newPrice }),
+        type: 'Price updated',
+        transactionHash: priceUpdateTxHash.toLowerCase(),
+        triggerAddress: transactionReceipt.from,
+      });
+
+      return true;
+    } catch (error) {
+      logger.error('VALIDATE_UPDATE_PRICE_ERR error', { trxData, error });
+      return false;
+    }
   }
 }
