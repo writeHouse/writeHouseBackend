@@ -254,7 +254,7 @@ export class ArticlesService {
     try {
       const { priceUpdateTxHash, chain, newPrice } = trxData;
       const { web3, marketContractAddress } = this.web3Config.getWeb3Params(chain);
-      //const web3Service = new Web3Service(web3);
+      // const web3Service = new Web3Service(web3);
 
       await this.checkReplayAttack(priceUpdateTxHash);
 
